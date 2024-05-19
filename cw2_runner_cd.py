@@ -1,6 +1,14 @@
 import pygame
 from sys import exit
 
+
+def display_score():
+    current_time = int(pygame.time.get_ticks() / 1000) - start_time
+    score_surface = font.render(f'{current_time}', 0, "White")
+    score_rect = score_surface.get_rect(center=(300, 15))
+    screen.blit(score_surface, score_rect)
+    return current_time
+
 pygame.init()  # uruchomienie silnika pygame
 
 WIDTH, HEIGHT = 600, 400
@@ -10,6 +18,7 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont('Arial', 24)  # czcionka systemowa
 player_gravity = 0
 game_active = True
+start_time = 0
 
 background_surface = pygame.image.load('images_PG/background.png').convert()  # definicja tła
 text_surface = font.render("Punkty: ", 1, "Black")  # definicja napisu
@@ -47,17 +56,18 @@ while True:
                     # print("Skok")
                     player_gravity = -20
         else:
-            if event.type == pygame.KEYDOWN and player_rect.bottom == 350:
-                if event.key == pygame.K_SPACE:
-                    game_active = True
-                    mashroom_rect.x = 700
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                game_active = True
+                mashroom_rect.x = 700
+                start_time = int(pygame.time.get_ticks() / 1000)
 
     if game_active:
         screen.blit(background_surface, (0, 0))  # wyświetlenie tła
         #pygame.draw.rect(screen, 'White', text_rect, 2)
         #pygame.draw.line(screen, "Red", (0, 0), pygame.mouse.get_pos(), 5)
 
-        screen.blit(text_surface, text_rect)  # wyświetlenie napisu
+        # screen.blit(text_surface, text_rect)  # wyświetlenie napisu
+        score = display_score()
 
         mashroom_rect.x -= 5
         if mashroom_rect.x < -100:
@@ -82,9 +92,18 @@ while True:
             game_active = False
     else:
         screen.fill("Black")
-        screen.blit(game_name, game_name_rect)
-        screen.blit(player_stay, player_stay_rect)
-        screen.blit(game_msg, game_msg_rect)
+        # screen.blit(game_name, game_name_rect)  # wypisanie powitania
+
+        score_msg = font.render(f'Twój wyniki to: {score}', False, "White")
+        score_msg_rect = score_msg.get_rect(center=(300, 15))
+        if score == 0:
+            screen.blit(game_name, game_name_rect)
+        else:
+            screen.blit(score_msg, score_msg_rect)
+
+        screen.blit(player_stay, player_stay_rect)  # grafika gracza
+        screen.blit(game_msg, game_msg_rect)  # komenda
+
 
     pygame.display.update()  #aktualizacja obraz
     clock.tick(60)  # fps - jak czesto ma sie aktualizowac ekran (60 klatek na sekunde)
