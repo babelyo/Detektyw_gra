@@ -9,6 +9,19 @@ def display_score():
     screen.blit(score_surface, score_rect)
     return current_time
 
+
+def player_animation():
+    global player_index, player_surf
+
+    if player_rect.bottom < 350:
+        player_surf = player_jump
+    else:
+        player_index += 0.1
+        if player_index >= len(player_walk):
+            player_index = 0
+        player_surf = player_walk[int(player_index)]
+
+
 pygame.init()  # uruchomienie silnika pygame
 
 WIDTH, HEIGHT = 600, 400
@@ -27,8 +40,17 @@ text_rect = text_surface.get_rect(center=(300, 15))
 mashroom_surface = pygame.image.load('images_PG/mashroom.png').convert_alpha()  # definicja przeszkody
 mashroom_rect = mashroom_surface.get_rect(bottomleft=(520, 350))  # opakowanie surface w prostokąt dla lepszego panowania
 
-player_surface = pygame.image.load('images_PG/girl_stay.png').convert_alpha()
-player_rect = player_surface.get_rect(bottomleft=(50, 350))
+# grafiki pod animacje
+player_walk_1 = pygame.image.load("images_PG/girl_walk.png").convert_alpha()
+player_walk_2 = pygame.image.load("images_PG/girl_walk2.png").convert_alpha()
+player_walk = [player_walk_1, player_walk_2]
+player_index = 0
+player_jump = pygame.image.load("images_PG/girl_jump.png").convert_alpha()
+
+player_surf = player_walk[player_index]
+
+# player_surface = pygame.image.load('images_PG/girl_stay.png').convert_alpha()
+player_rect = player_surf.get_rect(bottomleft=(50, 350))
 
 player_stay = pygame.image.load('images_PG/girl_stay.png').convert_alpha()
 player_stay = pygame.transform.scale2x(player_stay)
@@ -79,7 +101,9 @@ while True:
         player_rect.y += player_gravity
         if player_rect.bottom >= 350:
             player_rect.bottom = 350
-        screen.blit(player_surface, player_rect)
+
+        player_animation()
+        screen.blit(player_surf, player_rect)
 
         # # skakanie - sposób 1
         # keys = pygame.key.get_pressed()
