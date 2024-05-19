@@ -17,7 +17,11 @@ background_surface = pygame.image.load('images_PG/background.png').convert()  # 
 text_surface = font.render("Punkty: ", 1, "Black")  # definicja napisu
 
 mashroom_surface = pygame.image.load('images_PG/mashroom.png').convert_alpha()  # definicja przeszkody
-mashroom_x_pos = 520
+#mashroom_x_pos = 520
+mashroom_rect = mashroom_surface.get_rect(bottomleft=(520, 350))  # opakowanie surface w prostokąt dla lepszego panowania
+
+player_surface = pygame.image.load('images_PG/girl_stay.png').convert_alpha()
+player_rect = player_surface.get_rect(bottomleft=(50, 350))
 
 # nieskończona pętla do przytrzymania okna gry
 while True:
@@ -25,15 +29,30 @@ while True:
         if event.type == pygame.QUIT:  # sprawdzenie jaki to typ zdarzenia
             pygame.quit()  # wyjście z gry
             exit()
+        # if event.type == pygame.MOUSEMOTION:
+        #     if player_rect.collidepoint(event.pos):
+        #         print("zderzenie")
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #     print("nacisnieto")
 
     screen.blit(background_surface, (0, 0))  # wyświetlenie tła
     screen.blit(text_surface, (250, 10))  # wyświetlenie napisu
 
-    mashroom_x_pos -= 5
-    if mashroom_x_pos < -100:
-        mashroom_x_pos = 700
+    mashroom_rect.x -= 5
+    if mashroom_rect.x < -100:
+        mashroom_rect.x = 700
 
-    screen.blit(mashroom_surface, (mashroom_x_pos, 300))
+    #screen.blit(mashroom_surface, (mashroom_x_pos, 300))
+    screen.blit(mashroom_surface, mashroom_rect)
+
+    screen.blit(player_surface, player_rect)
+
+    # if player_rect.colliderect(mashroom_rect):
+    #     print("zderzenie")
+
+    # mouse_pos = pygame.mouse.get_pos()
+    # if player_rect.collidepoint(mouse_pos):
+    #     print(pygame.mouse.get_pressed())
 
     pygame.display.update()  #aktualizacja obraz
     clock.tick(60)  # fps - jak czesto ma sie aktualizowac ekran (60 klatek na sekunde)
