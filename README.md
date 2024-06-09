@@ -1,1 +1,1 @@
-# pygame_wro_1905
+# Detektyw
