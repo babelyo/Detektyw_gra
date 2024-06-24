@@ -1,16 +1,20 @@
 import pygame
 from sys import exit
 
-pygame.init()  # uruchomienie silnika pygame
 
-WIDTH, HEIGHT = 1600, 900
-step = 1
+def startup():
+    global WIDTH, HEIGHT, step, first_locations, menu_background, screen, clock
+    pygame.init()  # uruchomienie silnika pygame
 
-first_locations = pygame.image.load('office/background.png')
-menu_background = pygame.image.load('office/menu_background.png')
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Detektyw")
-clock = pygame.time.Clock()
+    WIDTH, HEIGHT = 1600, 900
+    step = 1
+
+    first_locations = pygame.image.load('office/background.png')
+    menu_background = pygame.image.load('office/menu_background.png')
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Detektyw")
+    clock = pygame.time.Clock()
+
 
 player_frames = []
 for i in range(47):
@@ -19,6 +23,7 @@ for i in range(47):
 
 
 current_scene = "menu"
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, frames, obstacles):
@@ -38,16 +43,16 @@ class Player(pygame.sprite.Sprite):
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] and not keys[pygame.K_s]:
             self.rect.y -= self.speed
             self.current_frame += self.animation_speed
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] and not keys[pygame.K_d]:
             self.rect.x -= self.speed
             self.current_frame += self.animation_speed
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] and not keys[pygame.K_w]:
             self.rect.y += self.speed
             self.current_frame += self.animation_speed
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] and not keys[pygame.K_a]:
             self.rect.x += self.speed
             self.current_frame += self.animation_speed
 
@@ -113,25 +118,26 @@ class Item:
         self.rect = self.image.get_rect()
 
 
+def lvl1_loading():
+    global all_sprites
+    dummy_obstacles = pygame.sprite.Group()
+    dummy_obstacles.add(Obstacle(1200, 600, "office/STOL.png"))
+    dummy_obstacles.add(Obstacle(1190, 710, "office/Sofa_s.png"))
+    dummy_obstacles.add(Obstacle(1390, 570, "office/Sofa_e.png"))
+    dummy_obstacles.add((Obstacle(850, 150, "office/szafka.png")))
+    dummy_obstacles.add((Obstacle(855, 55, "office/gramofon.png")))
+    dummy_rack_y = 100
+    for _ in range(6):
+        dummy_obstacles.add((Obstacle(20, dummy_rack_y, "office/szafka_w.png")))
+        dummy_rack_y += 85
 
-dummy_obstacles = pygame.sprite.Group()
-dummy_obstacles.add(Obstacle(1200, 600, "office/STOL.png"))
-dummy_obstacles.add(Obstacle(1190, 710, "office/Sofa_s.png"))
-dummy_obstacles.add(Obstacle(1390, 570, "office/Sofa_e.png"))
-dummy_obstacles.add((Obstacle(850, 150, "office/szafka.png")))
-dummy_obstacles.add((Obstacle(855, 55, "office/gramofon.png")))
-dummy_rack_y = 100
-for _ in range(6):
-    dummy_obstacles.add((Obstacle(20, dummy_rack_y, "office/szafka_w.png")))
-    dummy_rack_y += 85
+    board = Board(300, 50, "office/board.png")
 
-board = Board(300, 50, "office/board.png")
-
-player = Player(800, 450, player_frames, dummy_obstacles)
-all_sprites = pygame.sprite.Group()
-all_sprites.add(dummy_obstacles)
-all_sprites.add(board)
-all_sprites.add(player)
+    player = Player(800, 450, player_frames, dummy_obstacles)
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(dummy_obstacles)
+    all_sprites.add(board)
+    all_sprites.add(player)
 
 
 def game_scene():
@@ -140,14 +146,13 @@ def game_scene():
         if event.type == pygame.QUIT:  # sprawdzenie jaki to typ zdarzenia
             pygame.quit()  # wyjście z gry
             exit()
-
     background_image = pygame.transform.scale(first_locations, (WIDTH, HEIGHT)).convert_alpha()
     screen.blit(background_image, (0, 0))
     all_sprites.update()
     all_sprites.draw(screen)
     pygame.display.update()  # aktualizacja obraz
-    print(player.rect.x, player.rect.y)
     clock.tick(60)  # fps - jak czesto ma sie aktualizowac ekran (60 klatek na sekunde)
+
 
 def control_scene():
     global current_scene
@@ -185,6 +190,7 @@ def menu_scene():
             exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_1:  # Przechodzenie do gry po naciśnięciu ENTER
+                lvl1_loading()
                 current_scene = "game"
             if event.key == pygame.K_3:
                 current_scene = "control"
@@ -206,6 +212,7 @@ def menu_scene():
     pygame.display.update()
 
 
+startup()
 while True:
     if current_scene == "menu":
         menu_scene()
